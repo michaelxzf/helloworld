@@ -101,4 +101,5 @@ jobs:
           PR_NUM="${PR_URL##*/}"
           gh pr merge "$PR_NUM" --repo "$GITHUB_REPOSITORY" --squash --delete-branch
           gh issue comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "Auto-fixed and merged in #$PR_NUM without human review (auto-fix label)."
-          # The merged PR body contains "Closes #N", so the issue closes itself on merge
+          # Explicit close: the "Closes #N" keyword in bot-created PR bodies is not always honored
+          gh issue close "$NUMBER" --repo "$GITHUB_REPOSITORY"
