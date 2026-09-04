@@ -11,5 +11,10 @@ def divide(a, b):
     return a / b
 
 
+def read_file(path):
+    with open(path) as f:
+        return f.read()
+
+
 if __name__ == "__main__":
     print(double(int(input("Enter a number: "))))
