@@ -49,18 +49,12 @@ jobs:
       - name: Install CodeBuddy CLI
         run: npm install -g @tencent-ai/codebuddy-code
 
-      # Model config (custom endpoint + key) injected from GitHub secret, never stored in the repo
-      - name: Restore CodeBuddy model config
-        env:
-          CODEBUDDY_MODELS: ${{ secrets.CODEBUDDY_MODELS }}
-        run: |
-          mkdir -p "$HOME/.codebuddy"
-          echo "$CODEBUDDY_MODELS" | base64 -d > "$HOME/.codebuddy/models.json"
-
       - name: Run CodeBuddy refactor (headless)
         env:
           GH_TOKEN: ${{ github.token }}
           NUMBER: ${{ github.event.issue.number }}
+          CODEBUDDY_AUTH_TOKEN: ${{ secrets.CODEBUDDY_AUTH_TOKEN }}
+          CODEBUDDY_INTERNET_ENVIRONMENT: ioa
         run: |
           ISSUE_TITLE=$(gh issue view "$NUMBER" --json title -q .title)
           ISSUE_BODY=$(gh issue view "$NUMBER" --json body -q .body)
@@ -68,7 +62,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "refactor/issue-$NUMBER"
           codebuddy -p --max-turns 10 \
-            --model custom-local:hy3 \
+            --model glm-5.3 \
             --permission-mode auto \
             --no-session-persistence \
             "You are running headless in CI, in the repository working directory.
