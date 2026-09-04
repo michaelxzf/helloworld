@@ -7,5 +7,9 @@ def double(number):
     return number * 2
 
 
+def divide(a, b):
+    return a / b
+
+
 if __name__ == "__main__":
     print(double(int(input("Enter a number: "))))
