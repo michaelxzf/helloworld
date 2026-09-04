@@ -1,0 +1,11 @@
+{
+  "name": "helloworld",
+  "version": "1.0.0",
+  "description": "Hello world application",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "node --test"
+  }
+}
