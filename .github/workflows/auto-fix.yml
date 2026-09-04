@@ -167,13 +167,19 @@ jobs:
             --tools "Read,Grep,Glob" \
             --no-session-persistence \
             --json-schema "$SCHEMA" \
-            "You are a strict code reviewer. Review ONLY the changes in the following git diff for
-          security vulnerabilities and bugs (logic flaws, injection, unsafe deserialization,
-          missing authorization, boundary/crash handling, resource leaks). Ignore style.
+            "You are a strict security-focused code reviewer. Review ONLY the changes in the
+          following git diff. The verdict MUST be FAIL if ANY of these exist in the changed code,
+          even if the issue requested it that way:
+          1. Unvalidated or caller-controlled input used in file paths (path traversal /
+             arbitrary file read/write/delete), SQL, shell commands, or network URLs (SSRF)
+          2. Unhandled crash conditions: division by zero, None dereference, missing keys
+          3. Missing authorization/ownership checks on sensitive operations
+          4. Hardcoded secrets or credentials
+          5. Unsafe deserialization of untrusted data
+          When in doubt, FAIL. Style, naming, and comments are never FAIL reasons.
           The change implements this GitHub issue: $ISSUE_TITLE.
           $DIFF
-          Return your verdict as JSON. FAIL only for real vulnerabilities or bugs that would
-          break behavior or security in the changed code. Style/naming/comments are never FAIL.")
+          Return your verdict as JSON.")
           VERDICT=$(printf '%s' "$REVIEW" | python3 -c "
           import json, sys
           raw = sys.stdin.read()
