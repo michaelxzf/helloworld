@@ -16,5 +16,9 @@ def read_file(path):
         return f.read()
 
 
+def delete_file(path):
+    os.remove(path)
+
+
 if __name__ == "__main__":
     print(double(int(input("Enter a number: "))))
