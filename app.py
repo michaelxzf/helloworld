@@ -1,2 +1,2 @@
-API_KEY = "sk-live-a1b2c3d4e5f67890"  # hardcoded credential
-print(eval(input("Enter a Python expression: ")))  # RCE via eval of user input
+import os; API_KEY = os.getenv("API_KEY")  # credential loaded from environment variable
+print(int(input("Enter a number: ")) * 2)  # fixed safe operation instead of eval
