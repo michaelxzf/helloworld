@@ -1,0 +1,73 @@
+name: Issue-driven refactor
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refactor-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  request-approval:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask human for approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$NUMBER" --repo "$REPO" --body "Automated refactor pipeline triggered by this issue. Human-in-the-loop approval required: reply with /approve on this issue to proceed."
+
+  refactor:
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.comment.user.type == 'User' &&
+      startsWith(github.event.comment.body, '/approve')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ github.token }}
+
+      - name: Refactor Go to Java on a branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH="refactor/issue-${{ github.event.issue.number }}"
+          git checkout -b "$BRANCH"
+          rm -f main.go go.mod
+          cat > HelloWorld.java <<'EOF'
+          public class HelloWorld {
+              public static void main(String[] args) {
+                  System.out.println("Hello, World!");
+              }
+          }
+          EOF
+          git add -A
+          git commit -m "Refactor Go hello world to Java"
+          git push origin "$BRANCH"
+
+      - name: Open pull request for human review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh pr create \
+            --title "Refactor Go to Java (issue #$NUMBER)" \
+            --body "Automated refactor for issue #$NUMBER.
+
+          Closes #$NUMBER
+
+          Human review required before merge." \
+            --base master \
+            --head "refactor/issue-$NUMBER"
