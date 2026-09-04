@@ -32,15 +32,11 @@ jobs:
           gh issue comment "$NUMBER" --repo "$REPO" --body "CodeBuddy pipeline triggered by this issue. Human-in-the-loop approval required: reply with /approve on this issue to proceed."
 
   # After /approve: CodeBuddy CLI does the AI refactor, then opens a PR (gate 2: human merges)
-  # Skipped when: issue carries the auto-fix label (handled by auto-fix.yml),
-  # or the issue is already closed (e.g. auto-fix finished it)
   codebuddy-refactor:
     if: >-
       github.event_name == 'issue_comment' &&
       github.event.comment.user.type == 'User' &&
-      startsWith(github.event.comment.body, '/approve') &&
-      !contains(github.event.issue.labels.*.name, 'auto-fix') &&
-      github.event.issue.state == 'open'
+      startsWith(github.event.comment.body, '/approve')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
