@@ -1,4 +1,6 @@
-from app import divide, double, read_file
+import pytest
+
+from app import delete_file, divide, double, read_file
 
 
 def test_double_positive():
@@ -41,3 +43,15 @@ def test_read_file_preserves_multiline_contents(tmp_path):
     file_path = tmp_path / "lines.txt"
     file_path.write_text("first\nsecond\n")
     assert read_file(str(file_path)) == "first\nsecond\n"
+
+
+def test_delete_file_removes_existing_file(tmp_path):
+    file_path = tmp_path / "to_delete.txt"
+    file_path.write_text("data")
+    delete_file(str(file_path))
+    assert not file_path.exists()
+
+
+def test_delete_file_missing_raises(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        delete_file(str(tmp_path / "missing.txt"))
