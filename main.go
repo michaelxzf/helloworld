@@ -8,9 +8,6 @@ import (
 	"strings"
 )
 
-// credential loaded from environment variable
-var apiKey = os.Getenv("API_KEY")
-
 func main() {
 	fmt.Println("Hello, World!")
 
@@ -25,5 +22,5 @@ func main() {
 		fmt.Println("Invalid input: please enter a valid integer.")
 		return
 	}
-	fmt.Println(number * 2)
+	fmt.Println(double(number))
 }
